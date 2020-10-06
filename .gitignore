@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!.env.example
+!.htaccess
+!index.php
+!load.php
+!functions.php
+!composer.json
+!README.md
+!LICENSE
