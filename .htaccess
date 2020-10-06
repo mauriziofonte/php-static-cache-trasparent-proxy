@@ -7,6 +7,10 @@ ErrorDocument 403 "Access Forbidden"
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
+
+	# To HTTPS
+	RewriteCond %{HTTPS} off
+    RewriteRule ^/(.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 	
 	# Catch-all for all requests that DO NOT have a valid
 	# file in the cache. The file will be mirrored from the 
