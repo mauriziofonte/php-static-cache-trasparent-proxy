@@ -18,7 +18,8 @@ ErrorDocument 403 "Access Forbidden"
 	RewriteRule ^index\.php$ - [L]
 	RewriteRule ^(.*/)?\.git+ - [R=403,L]
 	RewriteRule ^(.*/)?vendor+ - [R=403,L]
-	RewriteCond %{QUERY_STRING} cdn_purge=1 [or]
+	RewriteCond %{QUERY_STRING} purge=1 [or]
+	RewriteCond %{QUERY_STRING} purge=true [or]	
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule . index.php [E=REMOTE_USER:%{HTTP:Authorization},L]
@@ -182,7 +183,7 @@ ErrorDocument 403 "Access Forbidden"
 		Header set Pragma "public"
 		Header append Cache-Control "public"
 		Header unset Set-Cookie
-		Header set X-Powered-By "Static Resources Cacher/1.0.0"
+		Header set X-Powered-By "Static Assets Cacher/1.0.0"
 	</IfModule>
 </FilesMatch>
 
@@ -192,7 +193,7 @@ ErrorDocument 403 "Access Forbidden"
 		Header append Vary User-Agent env=!dont-vary
 		Header set Pragma "public"
 		Header append Cache-Control "public"
-		Header set X-Powered-By "Static Resources Cacher/1.0.0"
+		Header set X-Powered-By "Static Assets Cacher/1.0.0"
 	</IfModule>
 </FilesMatch>
 
@@ -202,7 +203,7 @@ ErrorDocument 403 "Access Forbidden"
 		Header set Pragma "public"
 		Header append Cache-Control "public"
 		Header unset Set-Cookie
-		Header set X-Powered-By "Static Resources Cacher/1.0.0"
+		Header set X-Powered-By "Static Assets Cacher/1.0.0"
 	</IfModule>
 </FilesMatch>
 
