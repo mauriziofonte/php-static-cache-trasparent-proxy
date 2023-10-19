@@ -16,13 +16,13 @@ This is useful, for example, if you:
 
 ## Request lifecycle
 
-1. The client requests a _Web Page_ of your website
-2. That _Web Page_ contains references to static assets (images, css, js, etc) that are re-routed to the CDN in a 1:1 pattern, like `https://my-project.example.com/images/whatever/resource.jpg` -> `https://static.mycdn.com/images/whatever/resource.jpg`
-3. The _Transparent Proxy CDN_ receives the _Request_ (file path) and checks if the requested _Resource_ is already present in its filesystem
-4. If the _Resource_ is physically present on the CDN's filesystem, it is served to the client and optimized via the `.htaccess` _Expires_ and _Cache-Control_ directives
-5. If the _Resource_ is not present on the CDN's filesystem:
-  5.1 If you **have not** enabled the Image to WEBP conversion API, or the _Request_ does not belong to a convertable image, the origin file is **automatically fetched from the origin server** and served to the _Client_, and then it is **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP
-  5.2 If you **have** enabled the Image to WEBP conversion API, and the _Request_ is convert-able to a **webp** image (jpg,jpeg,png,gif,bmp), the _Transparent Proxy CDN_ will **automatically fetch the image from the origin server**, convert it to **webp** via the **Image to WEBP conversion API**, serve it to the _Client_, and then the **webp** version of the image gets **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP. **Subsequent requests** to the same image will be **301-redirected** to the **webp** version of the image.
+- The client requests a _Web Page_ of your website
+- That _Web Page_ contains references to static assets (images, css, js, etc) that are re-routed to the CDN in a 1:1 pattern, like `https://my-project.example.com/images/whatever/resource.jpg` -> `https://static.mycdn.com/images/whatever/resource.jpg`
+- The _Transparent Proxy CDN_ receives the _Request_ (file path) and checks if the requested _Resource_ is already present in its filesystem
+- If the _Resource_ is physically present on the CDN's filesystem, it is served to the client and optimized via the `.htaccess` _Expires_ and _Cache-Control_ directives
+- If the _Resource_ is not present on the CDN's filesystem:
+  - If you **have not** enabled the Image to WEBP conversion API, or the _Request_ does not belong to a convertable image, the origin file is **automatically fetched from the origin server** and served to the _Client_, and then it is **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP
+  - If you **have** enabled the Image to WEBP conversion API, and the _Request_ is convert-able to a **webp** image (jpg,jpeg,png,gif,bmp), the _Transparent Proxy CDN_ will **automatically fetch the image from the origin server**, convert it to **webp** via the **Image to WEBP conversion API**, serve it to the _Client_, and then the **webp** version of the image gets **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP. **Subsequent requests** to the same image will be **301-redirected** to the **webp** version of the image.
 
 ## Can you give me an example of what's going on?
 
@@ -71,19 +71,25 @@ Specifically, if you want to use the **Image to WEBP conversion API**, you need 
 >
 > If you modify the `.env` file, you need to **manually delete** the `.cached.env.php` file to force the application to re-read the `.env` file.
 
-## What to do on the frontend, to rewrite static assets to the CDN
+## How to re-route static assets from your origin server to the CDN
 
-It depends on your application. If it is a CMS, refer to the CMS's output buffering and/or output filter functionalities. If it's something custom, you can do the following (untested!):
+It depends on your application.
+
+- If it is a CMS, refer to the CMS's output buffering and/or output filter functionalities.
+- You can always configure the `.htaccess` file to redirect all static assets to the CDN itself (example below)
+- If it's something custom, you can do the following (untested!):
 
 ```php
 <?php
+    // this is a very basic example of how to use output buffering to rewrite static assets
     ob_start('rewrite_static_assets');
-    ... app ...
-    ... app ...
+    ... app code ...
+    ... app code ...
     $html = ob_get_clean();
     echo $html;
     exit();
 
+    // this is the function that will be called by the output buffer. Every <img> and <link rel="stylesheet" type="text/css"> will be re-routed to the CDN
     function rewrite_static_assets($buffer) {
         // rewrite <img > assets (works only if images are referenced with absolute paths without protocol+domain)
         $buffer = preg_replace_callback('<img\s+src="([^"]+)"', function($matches) {
@@ -101,6 +107,17 @@ It depends on your application. If it is a CMS, refer to the CMS's output buffer
         return $buffer;
     }
 ?>
+```
+
+To configure a permanent redirect of all static assets to the CDN itself, you can use the following `.htaccess` file:
+
+```apache
+<IfModule mod_rewrite.c>
+    ### Rewrite all css, js, jpeg, jpg, png, gif, bmp, webp, ttf, woff, woff2, otf, eot, svg, ico files to the CDN
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} \.(css|js|jpg|jpeg|png|gif|bmp|webp|ttf|woff|woff2|otf|eot|svg|ico)$ [NC]
+    RewriteRule ^(.*)$ https://static.mycdn.com/$1 [R=301,L]
+</IfModule>
 ```
 
 ## How to configure the .env
