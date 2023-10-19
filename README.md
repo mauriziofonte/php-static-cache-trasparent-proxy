@@ -20,7 +20,9 @@ This is useful, for example, if you:
 2. That _Web Page_ contains references to static assets (images, css, js, etc) that are re-routed to the CDN in a 1:1 pattern, like `https://my-project.example.com/images/whatever/resource.jpg` -> `https://static.mycdn.com/images/whatever/resource.jpg`
 3. The _Transparent Proxy CDN_ receives the _Request_ (file path) and checks if the requested _Resource_ is already present in its filesystem
 4. If the _Resource_ is physically present on the CDN's filesystem, it is served to the client and optimized via the `.htaccess` _Expires_ and _Cache-Control_ directives
-5. If the _Resource_ is not present on the CDN's filesystem, it is **automatically fetched from the origin server** and served to the _Client_, and then it is **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP
+5. If the _Resource_ is not present on the CDN's filesystem:
+  5.1 If you **have not** enabled the Image to WEBP conversion API, or the _Request_ does not belong to a convertable image, the origin file is **automatically fetched from the origin server** and served to the _Client_, and then it is **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP
+  5.2 If you **have** enabled the Image to WEBP conversion API, and the _Request_ is convert-able to a **webp** image (jpg,jpeg,png,gif,bmp), the _Transparent Proxy CDN_ will **automatically fetch the image from the origin server**, convert it to **webp** via the **Image to WEBP conversion API**, serve it to the _Client_, and then the **webp** version of the image gets **cached** on the CDN's filesystem. In this case, _headers_ are blindly mirrored from the origin server to the client, and the _Expires_ and _Cache-Control_ directives are set via PHP. **Subsequent requests** to the same image will be **301-redirected** to the **webp** version of the image.
 
 ## Can you give me an example of what's going on?
 
