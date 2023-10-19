@@ -5,9 +5,9 @@
 !.gitignore
 !.env.example
 !.htaccess
-!index.php
-!load.php
-!functions.php
+!bootstrap.php
 !composer.json
 !README.md
 !LICENSE
+!public/index.php
+!helpers/functions.php

@@ -185,7 +185,8 @@ ErrorDocument 403 "Access Forbidden"
 		Header set Pragma "public"
 		Header append Cache-Control "public"
 		Header unset Set-Cookie
-		Header set X-Powered-By "Static Assets Cacher/1.0.0"
+		Header set X-Powered-By "MF Static Assets Cacher/1.0.0"
+		Header set X-Cache-Status "HIT"
 	</IfModule>
 </FilesMatch>
 
@@ -195,7 +196,8 @@ ErrorDocument 403 "Access Forbidden"
 		Header append Vary User-Agent env=!dont-vary
 		Header set Pragma "public"
 		Header append Cache-Control "public"
-		Header set X-Powered-By "Static Assets Cacher/1.0.0"
+		Header set X-Powered-By "MF Static Assets Cacher/1.0.0"
+		Header set X-Cache-Status "HIT"
 	</IfModule>
 </FilesMatch>
 
@@ -205,7 +207,8 @@ ErrorDocument 403 "Access Forbidden"
 		Header set Pragma "public"
 		Header append Cache-Control "public"
 		Header unset Set-Cookie
-		Header set X-Powered-By "Static Assets Cacher/1.0.0"
+		Header set X-Powered-By "MF Static Assets Cacher/1.0.0"
+		Header set X-Cache-Status "HIT"
 	</IfModule>
 </FilesMatch>
 
